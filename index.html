@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+  <title>コア生産シミュレーション（N343/N416）</title>
+  <meta name="theme-color" content="#22c55e">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <style>
+    :root{--bg:#0b0f12;--card:#11161a;--fg:#e5e7eb;--muted:#9ca3af;--border:#1f2937;--accent:#22c55e;--pad:14px;--radius:12px;}
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,system-ui,'Segoe UI',Roboto,'Helvetica Neue',Arial}
+    header{position:sticky;top:0;background:var(--card);border-bottom:1px solid var(--border);padding:16px;z-index:10}
+    h1{margin:0;font-size:18px}
+    .wrap{max-width:900px;margin:0 auto;padding:16px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:var(--pad);margin-bottom:12px}
+    label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+    input,button{font-size:16px}
+    input[type="number"],input[type="month"]{width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:#0e1419;color:#e5e7eb}
+    button{padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:#22c55e;color:#052e12;font-weight:700;cursor:pointer}
+    .row{display:flex;gap:8px;align-items:end;flex-wrap:wrap}
+    .row > div{flex:1;min-width:200px}
+    .muted{color:#9ca3af}
+    .badge{display:inline-block;padding:2px 8px;border-radius:999px;background:#0e2f1a;border:1px solid #165f32;color:#93f1b8;font-size:12px}
+    .wdbar{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:8px 0}
+    .wdbar button{flex:0 1 44px;padding:10px 12px;border-radius:999px;background:#0e1419;color:#e5e7eb;border:1px solid #1f2937}
+    .wdbar button.on{background:#154f35;border-color:#1e7b50}
+    .wdpresets{display:flex;gap:6px;justify-content:center;margin:8px 0}
+    .wdpresets button{flex:0 1 120px}
+    table{width:100%;border-collapse:collapse}
+    th,td{border-bottom:1px solid #1f2937;padding:10px;text-align:center}
+    th{position:sticky;top:0;background:#11161a;z-index:1}
+    .sat{color:#7aa7ff}
+    .sun{color:#ff8a8a}
+    .setup{background:#2a2f17}
+    .shighlight{background:#172f2a}
+    .holiday{opacity:0.6}
+    .tcell input[type="checkbox"]{width:22px;height:22px}
+    footer{position:sticky;bottom:0;background:#11161a;border-top:1px solid #1f2937;padding:10px}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>コア生産シミュレーション <span class="badge">N343=3ｷ兼用</span></h1>
+  </header>
+
+  <div class="wrap">
+    <div class="card">
+      <label>稼働曜日（タップでON/OFF）</label>
+      <div id="wdbar" class="wdbar">
+        <button data-wd="1">月</button>
+        <button data-wd="2">火</button>
+        <button data-wd="3">水</button>
+        <button data-wd="4">木</button>
+        <button data-wd="5">金</button>
+        <button data-wd="6">土</button>
+        <button data-wd="0">日</button>
+      </div>
+      <div class="wdpresets">
+        <button id="preset-weekdays">平日ON</button>
+        <button id="preset-all">全選択</button>
+        <button id="preset-none">全解除</button>
+      </div>
+      <div class="row">
+        <div>
+          <label>対象月（yyyy-mm）</label>
+          <input id="ym" type="month">
+        </div>
+        <div>
+          <label>月産数（ｺｱ月産目標数量）</label>
+          <input id="monthlyTarget" type="number" inputmode="numeric" value="44000" min="0" step="1">
+        </div>
+        <div>
+          <label>段替え日数（ｺｱ→3ｷ→ｺｱ）</label>
+          <input id="setupDays" type="number" inputmode="numeric" value="2" min="0" max="2">
+        </div>
+        <div>
+          <label>月初棚卸<span class="muted">0.0–1.0 日（0.1刻み）</span></label>
+          <input id="invDays" type="number" inputmode="decimal" value="0.0" min="0" max="1" step="0.1">
+        </div>
+      </div>
+      <p class="muted">3ｷ生産は下表の<strong>3ｷ</strong>列で開始日と終了日をチェックすると、その間を自動連続化します。<br>段替えは直近の稼働日に寄せます。<br>月産は可動スロット（N416の全稼働日＋N343の3ｷ段替え以外）に対して均等配分し整数化。<br>棚卸は月初の<strong>最初の稼働日</strong>に適用。<br>N343がその日3ｷ生産ならN343の棚卸停止はSに包含し、追加で減らしません。</p>
+      <div class="row">
+        <button id="run">この条件でシミュレーション</button>
+        <button id="clearS">S選択クリア</button>
+        <button id="clearH">休日クリア</button>
+        <button id="save">保存</button>
+        <button id="load">読込</button>
+        <button id="clear">初期化</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin:0 0 8px 0">集計</h3>
+      <div id="summary" class="muted">（ここに結果が表示されます）</div>
+      <div class="muted" id="hints" style="margin-top:8px"></div>
+    </div>
+
+    <div class="card">
+      <table id="tbl">
+        <thead>
+          <tr>
+            <th>日付</th>
+            <th>曜日</th>
+            <th>休日</th>
+            <th>3ｷ</th>
+            <th>N343</th>
+            <th>N416</th>
+            <th>当日合計</th>
+            <th>当月累計</th>
+            <th>備考</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer>
+    <small class="muted">オフライン対応／ホーム画面追加対応。入力と日付選択は端末に保存（localStorage）。</small>
+  </footer>
+
+  <script src="./app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
+    }
+  </script>
+</body>
+</html>
