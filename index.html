@@ -40,6 +40,27 @@
     /* ↓ 日付セルを二段表示しても詰まらないように */
     td:first-child{line-height:1.1}
     footer{position:sticky;bottom:0;background:#11161a;border-top:1px solid #1f2937;padding:10px}
+    /* 基本：表は折り返さない */
+#tbl th,
+#tbl td { white-space: nowrap; word-break: keep-all; }
+
+/* 日付セルだけは <br> で縦2段表示を許可 */
+#tbl td:first-child { 
+  white-space: normal;     /* ←ここだけ改行OK */
+  line-height: 1.15;
+}
+
+/* iPhone等の狭幅向けに、数字系カラムを少しだけ小さく＆余白も控えめに */
+@media (max-width: 430px) {
+  #tbl th, #tbl td { padding: 8px 6px; }
+  /* 日付セルのサイズ感 */
+  #tbl td:first-child { font-size: 13px; }
+  /* 数値カラム（N343/N416/当日合計/当月累計） */
+  #tbl th:nth-child(4), #tbl th:nth-child(5), #tbl th:nth-child(6), #tbl th:nth-child(7),
+  #tbl td:nth-child(4), #tbl td:nth-child(5), #tbl td:nth-child(6), #tbl td:nth-child(7) {
+    font-size: 13px;
+  }
+}
   </style>
 </head>
 <body>
