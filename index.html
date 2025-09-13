@@ -61,6 +61,46 @@
     font-size: 13px;
   }
 }
+/* --- 表示の基本: 数字や見出しは折返し禁止、等幅数字で揃える --- */
+#tbl th,
+#tbl td {
+  white-space: nowrap;         /* ←勝手に改行させない */
+  word-break: keep-all;        /* ←カンマや漢字での分割を防止 */
+  font-variant-numeric: tabular-nums; /* 桁が揃って見やすい */
+}
+
+/* 日付セルだけは <br> を有効化（01<br>(月) 用） */
+#tbl td:first-child {
+  white-space: normal;         /* ←ここだけ改行OK */
+  line-height: 1.15;
+}
+
+/* 数値列は右寄せにして読みやすく（N343/N416/当日合計/当月累計） */
+#tbl th:nth-child(4), #tbl th:nth-child(5), #tbl th:nth-child(6), #tbl th:nth-child(7),
+#tbl td:nth-child(4), #tbl td:nth-child(5), #tbl td:nth-child(6), #tbl td:nth-child(7) {
+  text-align: right;
+}
+
+/* チェックボックス列は狭めに */
+#tbl th:nth-child(2), #tbl th:nth-child(3),
+#tbl td:nth-child(2), #tbl td:nth-child(3) {
+  width: 44px;                 /* 目安幅。足りなければ 50〜56px に */
+}
+
+/* スマホ幅向け（iPhone想定）: フォント/余白を少し詰める */
+@media (max-width: 430px) {
+  #tbl th, #tbl td { padding: 6px 4px; font-size: 12px; }
+  #tbl td:first-child { font-size: 11px; }      /* 日付はさらに少し小さめ */
+  /* 数値列は最低幅を確保して折返し回避（必要に応じて数値調整） */
+  #tbl th:nth-child(4), #tbl th:nth-child(5), #tbl th:nth-child(6), #tbl th:nth-child(7),
+  #tbl td:nth-child(4), #tbl td:nth-child(5), #tbl td:nth-child(6), #tbl td:nth-child(7) {
+    min-width: 56px;
+  }
+  /* 備考は1行死守（はみ出しOKにする場合は overflow-x:auto を付けて横スクロール） */
+  #tbl th:nth-child(8), #tbl td:nth-child(8) {
+    max-width: 120px; overflow: hidden; text-overflow: ellipsis; /* ←省略表示したい場合 */
+  }
+}
   </style>
 </head>
 <body>
