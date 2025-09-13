@@ -199,8 +199,8 @@ function sim(){
     let m1=0, m2=0, note='';
     if(work){
       m2 = (dayAlloc[d]?.m2)||0;
-      if(isSetup) note = '機1 段替え';
-      else if(isS) note = '機1 S生産';
+      if(isSetup) note = '段替え';
+      else if(isS) note = '3ｷ生産';
       else m1 = (dayAlloc[d]?.m1)||0;
 
       if(firstWork && d===firstWork && invDays>0){
