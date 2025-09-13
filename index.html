@@ -28,8 +28,8 @@
     .wdbar button.on{background:#154f35;border-color:#1e7b50}
     .wdpresets{display:flex;gap:6px;justify-content:center;margin:8px 0}
     .wdpresets button{flex:0 1 120px}
-    table{width:100%;border-collapse:collapse}
-    th,td{border-bottom:1px solid #1f2937;padding:10px;text-align:center}
+    table{width:100%;border-collapse:collapse;table-layout:fixed}
+    th,td{border-bottom:1px solid #1f2937;padding:10px;text-align:center;word-break:break-word}
     th{position:sticky;top:0;background:#11161a;z-index:1}
     .sat{color:#7aa7ff}
     .sun{color:#ff8a8a}
@@ -37,6 +37,8 @@
     .shighlight{background:#172f2a}
     .holiday{opacity:0.6}
     .tcell input[type="checkbox"]{width:22px;height:22px}
+    /* ↓ 日付セルを二段表示しても詰まらないように */
+    td:first-child{line-height:1.1}
     footer{position:sticky;bottom:0;background:#11161a;border-top:1px solid #1f2937;padding:10px}
   </style>
 </head>
@@ -101,8 +103,8 @@
       <table id="tbl">
         <thead>
           <tr>
+            <!-- 曜日列を削除。日付セルは JS 側で「dd<br>(曜)」表示にします -->
             <th>日付</th>
-            <th>曜日</th>
             <th>休日</th>
             <th>3ｷ</th>
             <th>N343</th>
