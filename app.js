@@ -166,8 +166,11 @@ function sim(){
     }
   }
 
-  const totalWeight = slots.reduce((a,s)=>a+s.weight,0);
-  let perWeight = totalWeight>0 ? monthlyTarget / totalWeight : 0;
+
+  // ★ １台あたり（日産の基準値）
+  const totalWeight = slots.reduce((a, s) => a + s.weight, 0);
+  let perWeight = totalWeight > 0 ? monthlyTarget / totalWeight : 0;
+  const perSlotBase = Math.floor(perWeight);
 
   let dayAlloc = {};
   let residual = 0, producedTotal = 0;
@@ -190,6 +193,7 @@ function sim(){
 
   // Render (col index: 0 date,1 holiday,2 S,3 m1,4 m2,5 sum,6 cum,7 note)
   let total = 0, cum = 0;
+  let sumN343 = 0, sumN416 = 0;  // ★追加
   for(let d=1; d<=last; d++){
     const tr = document.querySelector(`tbody tr[data-d="${d}"]`);
     const work = isWork(y,m,d, workdays);
@@ -212,16 +216,19 @@ function sim(){
     }
 
     const daySum = m1+m2; total += daySum; cum += daySum;
+    sumN343 += m1;
+    sumN416 += m2;
     tr.children[3].textContent = fmt(m1);
     tr.children[4].textContent = fmt(m2);
     tr.children[5].textContent = fmt(daySum);
     tr.children[6].textContent = fmt(cum);
     tr.children[7].textContent = note;
   }
+  // 集計の表示（HTMLの <span> に流し込み）
+  document.getElementById('per-slot').textContent = fmt(perSlotBase);
+  document.getElementById('sum-n343').textContent = fmt(sumN343);
+  document.getElementById('sum-n416').textContent = fmt(sumN416);
 
-  $('#summary').innerHTML = `
-    <div>月産（目標）：<b>${fmt(monthlyTarget)}</b> / 実配分合計：<b>${fmt(total)}</b></div>
-  `;
   let hint = '';
   if(sDays.length>0){
     const contiguousLen = (Math.max(...sDays) - Math.min(...sDays) + 1);

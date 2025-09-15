@@ -106,6 +106,14 @@
     font-size: 11px;
   }
 }
+.summary-grid{display:grid;gap:8px;grid-template-columns:1fr 1fr}
+.summary-item{padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--card)}
+.summary-item .label{font-size:.9rem;color:var(--muted)}
+.summary-item .value{font-size:1.4rem;font-weight:700}
+#summary .muted{margin-top:6px;font-size:.85rem;color:var(--muted)}
+#per-slot-note{margin-left:.5em;font-size:.85rem;font-weight:400;opacity:.85}
+@media (max-width:520px){.summary-grid{grid-template-columns:1fr}}
+
   </style>
 </head>
 <body>
@@ -159,11 +167,25 @@
       </div>
     </div>
 
-    <div class="card">
-      <h3 style="margin:0 0 8px 0">集計</h3>
-      <div id="summary" class="muted">（ここに結果が表示されます）</div>
-      <div class="muted" id="hints" style="margin-top:8px"></div>
-    </div>
+    <section id="summary" class="card">
+      <h2>集計</h2>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <div class="label">N343 月産</div>
+          <div class="value"><span id="sum-n343">–</span></div>
+        </div>
+        <div class="summary-item">
+          <div class="label">N416 月産</div>
+          <div class="value"><span id="sum-n416">–</span></div>
+        </div>
+        <div class="summary-item">
+          <div class="label">１台あたりの日産数（平均・基準）</div>
+          <div class="value"><span id="per-slot">–</span><small id="per-slot-note"></small></div>
+        </div>
+      </div>
+      <div class="muted" id="summary-meta"></div>
+    </section>
+
 
     <div class="card">
       <table id="tbl">
